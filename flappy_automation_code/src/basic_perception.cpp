@@ -129,5 +129,5 @@ float BasicPerception::estimateReferenceVelocityX(){
     if(flappy_laser_scan.ranges[5] < EMERGENCY_BREAK){
         return 0.0;
     }
-    return SURGE_SPEED;
+    return TOP_SPEED;
 }
