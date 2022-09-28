@@ -17,7 +17,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}_node src/flappy_automation_code.cpp
+add_executable(${PROJECT_NAME}_node src/main.cpp
                                     src/PD_controller.cpp
                                     src/basic_perception.cpp)
 
