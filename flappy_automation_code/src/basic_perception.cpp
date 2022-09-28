@@ -11,7 +11,7 @@
 
 BasicPerception::BasicPerception(ros::NodeHandlePtr nh) : 
     sub_laser_scan{nh->subscribe<sensor_msgs::LaserScan>("/flappy_laser_scan", 1, &BasicPerception::laserSubRefencePub, this)},
-    pub_ref_pos{nh->advertise<geometry_msgs::Vector3>("/flappy_ref_pos", 1)},
+    pub_ref_pos{nh->advertise<geometry_msgs::Vector3>("/flappy_reference", 1)},
     pub_acc{nh->advertise<geometry_msgs::Vector3>("/flappy_acc", 1)}
 {
 }
@@ -21,9 +21,11 @@ BasicPerception::~BasicPerception(){
 void BasicPerception::laserSubRefencePub(const sensor_msgs::LaserScan::ConstPtr& msg){
     flappy_laser_scan = *msg;
     float wall_position = estimateClosestWallPosition();
-    float pos_ref = estimateReferencePositionY(wall_position);
+    float ref_pos_y = estimateReferencePositionY(wall_position);
+    float ref_vel_x = estimateReferenceVelocityX();
     geometry_msgs::Vector3 ref = geometry_msgs::Vector3();
-    ref.y = pos_ref;
+    ref.y = ref_pos_y;
+    ref.x = ref_vel_x;
     pub_ref_pos.publish(ref);
 
 }
@@ -47,16 +49,17 @@ float BasicPerception::estimateClosestWallPosition(){
         }
     }
 
-    if (valid_x_distance.empty()) {
+    if(valid_x_distance.empty()){
         return -1;
     }
 
     float sum = 0.0;
-    for (auto i : valid_x_distance) {
+    for(auto i : valid_x_distance){
         sum += (float)i;
     }
     float avg =  sum / valid_x_distance.size();
 
+    
     ROS_INFO("Estimated wall placement: %f", avg);
     //std::stringstream ss;
     //ss << "Data Retrieved: \n";
@@ -83,26 +86,48 @@ float BasicPerception::estimateReferencePositionY(float wall_estimate){
         }
     }
 
-    if (possible_reference_points_y.empty()) {
+    if (possible_reference_points_y.empty()){
         return 0.0;
     }
-
+    
     float sum = 0.0;
-    for (auto i : possible_reference_points_y) {
+    for(auto i : possible_reference_points_y){
         sum += (float)i;
     }
-    float avg =  sum / possible_reference_points_y.size();
+    float mean =  sum / possible_reference_points_y.size();
 
-    ROS_INFO("Estimated ref point: %f", avg);
-    //std::stringstream ss;
-    //ss << "Data Retrieved: \n";
-    //std::copy(possible_reference_points_y.begin(), possible_reference_points_y.end(), std::ostream_iterator<double>(ss, " "));
-    //ss << std::endl;
-    //ROS_INFO_STREAM(ss.str());
 
-    if (flappy_laser_scan.ranges[0] < 0.1 && flappy_laser_scan.ranges[9] < 0.1){
+    if(possible_reference_points_y.size() >= 2){
+        sum = 0.0;
+        for(auto i : possible_reference_points_y){
+            sum += std::pow((i-mean),2);
+        }
+        float std = std::sqrt(sum/possible_reference_points_y.size());
+        ROS_INFO("STD: %f", std);
+        sum = 0.0;
+        int count = 0;
+        for(auto i : possible_reference_points_y){
+            if(i < (mean + 0.5*std) || i > (mean - 0.5*std)){
+                sum += i;
+                count += 1;
+            }
+        }
+        float avg = sum / float(count);
+        ROS_INFO("Estimated ref point: %f", avg);
+        std::stringstream ss;
+        ss << "Data Retrieved: \n";
+        std::copy(possible_reference_points_y.begin(), possible_reference_points_y.end(), std::ostream_iterator<double>(ss, " "));
+        ss << std::endl;
+        ROS_INFO_STREAM(ss.str());
+        return avg;
+    }
+    
+    return mean;
+}
+
+float BasicPerception::estimateReferenceVelocityX(){
+    if(flappy_laser_scan.ranges[5] < EMERGENCY_BREAK){
         return 0.0;
     }
-
-    return avg;
+    return SURGE_SPEED;
 }

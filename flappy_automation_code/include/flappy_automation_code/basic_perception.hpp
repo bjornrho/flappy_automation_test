@@ -12,7 +12,10 @@ public:
     ~BasicPerception();
 
 private:
-    float WALL_WIDTH = 0.4;
+    float WALL_WIDTH = 1.0;
+    float GATE_OPENING = 1.5;
+    float SURGE_SPEED = 4.0;
+    float EMERGENCY_BREAK = 1.6;
 
     ros::Subscriber sub_laser_scan;
     ros::Publisher pub_ref_pos;
@@ -23,6 +26,7 @@ private:
     void laserSubRefencePub(const sensor_msgs::LaserScan::ConstPtr& msg);
     float estimateClosestWallPosition();
     float estimateReferencePositionY(const float wall_estimate);
+    float estimateReferenceVelocityX();
 };
 
 #endif
