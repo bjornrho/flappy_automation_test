@@ -21,8 +21,9 @@ float PDController::YPositionControl(geometry_msgs::Vector3 velocity_measurement
 float PDController::XVelocityControl(geometry_msgs::Vector3 velocity_measurement){
     float acceleration_x = (velocity_measurement.x - flappy_previous_velocity_x) / T;
     flappy_previous_velocity_x = velocity_measurement.x;
+    float velocity_error = flappy_reference_velocity_x - velocity_measurement.x;
 
-    return (KP_VEL*flappy_reference_velocity_x - KD_VEL*acceleration_x);
+    return KP_VEL*velocity_error - KD_VEL*acceleration_x;
 }
 
 
@@ -34,6 +35,7 @@ void PDController::refPosSub(const geometry_msgs::Vector3::ConstPtr& msg){
 void PDController::velSubPDPub(const geometry_msgs::Vector3::ConstPtr& msg){
     geometry_msgs::Vector3 acc_cmd = geometry_msgs::Vector3();
     acc_cmd.y = YPositionControl(*msg);
+    acc_cmd.x = XVelocityControl(*msg);
 
     pub_acc.publish(acc_cmd);
 }
