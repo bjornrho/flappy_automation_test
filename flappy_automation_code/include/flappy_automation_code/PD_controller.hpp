@@ -12,8 +12,8 @@ public:
     ~PDController();
 
 private:
-    const float KP = 25;
-    const float KD = 9;
+    const float KP = 30;
+    const float KD = 10;
     const float T = 1.0/30.0;
 
     ros::Subscriber sub_vel;

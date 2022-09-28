@@ -10,6 +10,7 @@ PDController::PDController(ros::NodeHandlePtr nh) :
     pub_acc{nh->advertise<geometry_msgs::Vector3>("/flappy_acc", 1)}
 {
     flappy_reference_position = geometry_msgs::Vector3();
+    flappy_reference_position.y = 0.5;
     flappy_position = geometry_msgs::Vector3();
     previous_error_value = geometry_msgs::Vector3();
 }
@@ -24,8 +25,8 @@ void PDController::velSubPDPub(const geometry_msgs::Vector3::ConstPtr& msg){
     geometry_msgs::Vector3 velocity_measurement = *msg;
     flappy_position.y += velocity_measurement.y*T;
 
-    float error_value = (flappy_reference_position.y - flappy_position.y);
-    acc_cmd.y = KP*error_value + KD*(0.0 - velocity_measurement.y);
+    float error_value = (flappy_reference_position.y);
+    acc_cmd.y = KP*error_value - KD*velocity_measurement.y;
     previous_error_value.y = error_value;
 
     pub_acc.publish(acc_cmd);
