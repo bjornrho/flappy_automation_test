@@ -24,7 +24,7 @@ float meanOfVector(std::vector<float> data_vector){
 /* ====== BasicPerception CLASS ====== */
 
 BasicPerception::BasicPerception(ros::NodeHandlePtr nh) : 
-    sub_laser_scan{nh->subscribe<sensor_msgs::LaserScan>("/flappy_laser_scan", 1, &BasicPerception::laserSubRefencePub, this)},
+    sub_laser_scan{nh->subscribe<sensor_msgs::LaserScan>("/flappy_laser_scan", 1, &BasicPerception::laserSubReferencePub, this)},
     pub_ref_pos{nh->advertise<geometry_msgs::Vector3>("/flappy_reference", 1)},
     pub_acc{nh->advertise<geometry_msgs::Vector3>("/flappy_acc", 1)}
 {
