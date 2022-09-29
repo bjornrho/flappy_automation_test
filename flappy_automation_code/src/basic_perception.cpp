@@ -44,12 +44,11 @@ void BasicPerception::laserSubRefencePub(const sensor_msgs::LaserScan::ConstPtr&
     geometry_msgs::Vector3 ref = geometry_msgs::Vector3();
     if((wall_position != -1) && (previous_wall_position != -1) && (wall_position - previous_wall_position) > 1.5){
         ref.y = 0.0;
-        ref.x = TOP_SPEED;
     }else{
         ref.y = ref_pos_y;
-        ref.x = ref_vel_x;
     }
-
+    ref.x = ref_vel_x;
+    
     pub_ref_pos.publish(ref);
 }
 

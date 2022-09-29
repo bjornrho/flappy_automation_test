@@ -14,7 +14,7 @@ public:
 private:
     float WALL_WIDTH = 1.0;
     float TOP_SPEED = 4.0;
-    float EMERGENCY_BREAK = 2.0;
+    float EMERGENCY_BREAK = 1.9;
 
     ros::Subscriber sub_laser_scan;
     ros::Publisher pub_ref_pos;
