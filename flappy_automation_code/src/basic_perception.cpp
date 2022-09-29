@@ -75,7 +75,7 @@ float BasicPerception::estimateClosestWallPosition(){
 }
 
 float BasicPerception::estimateReferencePositionY(float wall_position){
-    if (wall_position == -1){
+    if(wall_position == -1){
         return 0.0;
     }
 
@@ -89,10 +89,13 @@ float BasicPerception::estimateReferencePositionY(float wall_position){
             possible_reference_points_y.push_back(y_reference);
         }
     }
-
     float mean = meanOfVector(possible_reference_points_y);
+
+    if(mean == -1.0){
+        return 0.0;
+    }
     
-    return mean;
+    return meanOfVector(possible_reference_points_y);
 }
 
 float BasicPerception::estimateReferenceVelocityX(const float wall_position){
