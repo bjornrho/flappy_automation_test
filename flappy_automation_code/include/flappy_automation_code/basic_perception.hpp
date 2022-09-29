@@ -24,7 +24,7 @@ private:
     float flappy_reference_position_y;
     float previous_wall_position;
 
-    void laserSubRefencePub(const sensor_msgs::LaserScan::ConstPtr& msg);
+    void laserSubReferencePub(const sensor_msgs::LaserScan::ConstPtr& msg);
     float estimateClosestWallPosition();
     float estimateReferencePositionY(const float wall_position);
     float estimateReferenceVelocityX(const float wall_position);

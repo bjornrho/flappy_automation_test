@@ -34,7 +34,7 @@ BasicPerception::~BasicPerception(){
 }
 
 
-void BasicPerception::laserSubRefencePub(const sensor_msgs::LaserScan::ConstPtr& msg){
+void BasicPerception::laserSubReferencePub(const sensor_msgs::LaserScan::ConstPtr& msg){
     flappy_laser_scan = *msg;
 
     float wall_position = estimateClosestWallPosition();
@@ -48,7 +48,7 @@ void BasicPerception::laserSubRefencePub(const sensor_msgs::LaserScan::ConstPtr&
         ref.y = ref_pos_y;
     }
     ref.x = ref_vel_x;
-    
+
     pub_ref_pos.publish(ref);
 }
 
