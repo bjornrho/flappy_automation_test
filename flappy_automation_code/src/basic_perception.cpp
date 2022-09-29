@@ -46,6 +46,36 @@ float meanOfVector(std::vector<float> data_vector){
     return sum / data_vector.size();
 }
 
+float outlierRejectionSTD(std::vector<float> data_vector, float data_vector_mean){
+    float sum = 0.0;
+    for(auto i : data_vector){
+        sum += std::pow((i-data_vector_mean),2);
+    }
+    float std = std::sqrt(sum/data_vector.size());
+    sum = 0.0;
+    int count = 0;
+    for(auto i : data_vector){
+        if(i < (data_vector_mean + 0.5*std) || i > (data_vector_mean - 0.5*std)){
+            sum += i;
+            count += 1;
+        }
+    }
+    return sum / float(count);
+}
+
+float outlierRejectionIQR(std::vector<float> data_vector){
+    float sum = 0.0;
+    int count = 0;
+    std::vector<float> limits = IQR(data_vector, data_vector.size());
+    for(auto i : data_vector){
+        if(i > limits[0] && i < limits[1]){
+            sum += (float)i;
+            count += 1;
+        }
+    }
+    return sum / count;
+}
+
 BasicPerception::BasicPerception(ros::NodeHandlePtr nh) : 
     sub_laser_scan{nh->subscribe<sensor_msgs::LaserScan>("/flappy_laser_scan", 1, &BasicPerception::laserSubRefencePub, this)},
     pub_ref_pos{nh->advertise<geometry_msgs::Vector3>("/flappy_reference", 1)},
@@ -116,37 +146,18 @@ float BasicPerception::estimateReferencePositionY(float wall_position){
 
     float mean = meanOfVector(possible_reference_points_y);
 
-    // Simple outlier rejection using std
-    //sum = 0.0;
-    //int count = 0;
-    //std::vector<float> limits = IQR(possible_reference_points_y, possible_reference_points_y.size());
-    //for(auto i : possible_reference_points_y){
-    //    if(i > limits[0] && i < limits[1]){
-    //        sum += (float)i;
-    //        count += 1;
-    //    }
-    //}
-    //if(sum != 0.0){
-    //    return (sum / count);
-    //}
-
-
     // Outlier rejection using Interquartile Range (IQR)
-    //if(possible_reference_points_y.size() >= 2){
-    //    sum = 0.0;
-    //    for(auto i : possible_reference_points_y){
-    //        sum += std::pow((i-mean),2);
+    //if(possible_reference_points_y.size() > 1){
+    //    float outliersRemoved = outlierRejectionIQR(possible_reference_points_y);
+    //    if(outliersRemoved > 0.0){
+    //        mean = outliersRemoved;
     //    }
-    //    float std = std::sqrt(sum/possible_reference_points_y.size());
-    //    sum = 0.0;
-    //    int count = 0;
-    //    for(auto i : possible_reference_points_y){
-    //        if(i < (mean + 0.5*std) || i > (mean - 0.5*std)){
-    //            sum += i;
-    //            count += 1;
-    //        }
-    //    }
-    //    return sum / float(count);
+    //}
+
+
+    // Simple outlier rejection using std
+    //if(possible_reference_points_y.size() > 1){
+    //    mean = outlierRejectionSTD(possible_reference_points_y, mean);
     //}
     
     return mean;
