@@ -3,7 +3,6 @@ project(flappy_automation_code)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   std_msgs
 )
 
