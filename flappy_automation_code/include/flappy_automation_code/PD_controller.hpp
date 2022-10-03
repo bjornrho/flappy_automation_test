@@ -1,7 +1,6 @@
 #ifndef PD_CONTROLLER_H_
 #define PD_CONTROLLER_H_
 #include <ros/ros.h>
-#include "sensor_msgs/LaserScan.h"
 #include "geometry_msgs/Vector3.h"
 
 
